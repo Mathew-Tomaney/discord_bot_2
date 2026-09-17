@@ -80,53 +80,6 @@ npm start
 ```
 
 Keep yt-dlp fresh with `yt-dlp -U` (or `winget upgrade yt-dlp.yt-dlp`) if YouTube playback ever breaks.
-
----
-
-## 3. Hosting for free
-
-Honest summary first: **truly free, always-on hosting that can also reach YouTube reliably is scarce in 2026.** Most "free tier" platforms (Railway, Fly, Render, Heroku) have either dropped free plans or sleep idle apps, which kills a voice bot. The two approaches below actually work.
-
-### Option 1 — Your own PC, only during sessions (simplest, most reliable)
-
-You only need the bot while you're playing. Running it on the PC you're already using for the session costs nothing, and because it uses your home internet connection YouTube treats it like a normal viewer. Cloud servers frequently get YouTube's *"Sign in to confirm you're not a bot"* wall; your home connection almost never does.
-
-- Docker Desktop: `docker compose up -d` before the session, `docker compose stop` after. Or just leave it; it uses ~100MB RAM idling.
-- To start it automatically when you log in on Windows: `docker compose up -d` once with `restart: unless-stopped` (already set) and make sure Docker Desktop starts with Windows.
-- A Raspberry Pi 4/5 or an old laptop in a cupboard does the same job 24/7 for pennies of electricity. The Docker image builds for ARM as well.
-
-### Option 2 — Oracle Cloud "Always Free" VM (free 24/7 server)
-
-Oracle's Always Free tier is the one genuinely permanent free VM offering: an ARM VM with up to 4 cores / 24GB RAM, or two tiny x86 VMs (1GB RAM each, plenty for this bot). It needs a credit/debit card for identity verification but is not charged.
-
-1. Sign up at https://www.oracle.com/cloud/free/ . Pick a home region close to you (it cannot be changed later). If your region shows "out of capacity" for ARM, use a **VM.Standard.E2.1.Micro** (x86) shape instead — it runs this bot fine.
-2. Create a Compute instance: image **Ubuntu 24.04**, upload/download an SSH key. Note the public IP.
-3. SSH in and install Docker:
-   ```bash
-   curl -fsSL https://get.docker.com | sudo sh
-   sudo usermod -aG docker $USER && newgrp docker
-   ```
-4. Copy the project up and start it:
-   ```bash
-   git clone <your-repo-url> dnd-bot && cd dnd-bot     # or scp the folder
-   cp .env.example .env && nano .env                   # paste token
-   docker compose up -d --build
-   ```
-   `restart: unless-stopped` means it comes back after reboots. No inbound ports need opening; the bot only makes outbound connections.
-5. **Avoid the idle-reclaim rule.** Oracle may reclaim an Always Free instance that sits at very low CPU for a week. Either upgrade the account to *Pay As You Go* (still $0 within the free limits, and it removes the reclaim rule), or leave the bot running so it's never truly idle.
-
-**The YouTube catch on cloud servers.** Data-centre IP ranges often get *"Sign in to confirm you're not a bot"*. Fixes, in order of effort:
-
-- Export cookies from a browser where you're logged into YouTube (extensions like *Get cookies.txt LOCALLY* produce the right Netscape format), upload the file as `cookies.txt` next to `docker-compose.yml`, uncomment the cookies volume line in `docker-compose.yml`, and set `YTDLP_COOKIES=/app/cookies.txt` in `.env`. Use a throwaway Google account, not your main one.
-- Route yt-dlp through a proxy / WARP with `YTDLP_ARGS=--proxy ...`.
-- Or fall back to running at home (Option 1). It's the reason that option comes first.
-
-### Other free options, briefly
-
-- **Google Cloud e2-micro** is also Always Free but caps outbound traffic at 1GB/month; a four-hour session streams ~150MB, so it's borderline.
-- **AWS / Azure** free tiers expire after 6–12 months.
-- **Game-panel "free Discord hosting" sites** generally lack ffmpeg or throttle CPU. Not worth the fight.
-
 ---
 
 ## Adding your own sound effects

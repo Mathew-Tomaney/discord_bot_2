@@ -1,0 +1,22 @@
+{
+  "name": "dnd-bot",
+  "version": "1.0.0",
+  "description": "Discord music + soundboard bot for tabletop sessions. YouTube queue via yt-dlp, PCM mixer so sound effects play over music.",
+  "type": "module",
+  "main": "src/index.js",
+  "engines": { "node": ">=22.12.0" },
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy": "node src/deploy-commands.js",
+    "sfx": "node scripts/generate-sfx.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/voice": "^0.19.2",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.4.2",
+    "libsodium-wrappers": "^0.7.15",
+    "opusscript": "^0.1.1"
+  }
+}

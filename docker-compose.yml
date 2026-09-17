@@ -1,0 +1,19 @@
+services:
+  bot:
+    build: .
+    image: dnd-bot
+    container_name: dnd-bot
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      # Your own soundboard clips. Drop .mp3/.ogg/.wav files here; /sfx reload picks them up.
+      - ./sounds:/app/sounds
+      # Optional: YouTube cookies for cloud hosts that get the "confirm you're not a bot" wall.
+      # - ./cookies.txt:/app/cookies.txt:ro
+    # A single stream plus a few sound effects uses ~150MB; cap it so a runaway can't take the host down.
+    mem_limit: 512m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
